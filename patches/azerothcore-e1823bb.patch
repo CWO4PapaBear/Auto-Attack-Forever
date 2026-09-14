@@ -1,0 +1,89 @@
+--- a/src/server/game/Handlers/CombatHandler.cpp
++++ b/src/server/game/Handlers/CombatHandler.cpp
+@@ -24,6 +24,8 @@
+ #include "Vehicle.h"
+ #include "WorldPacket.h"
+ #include "WorldSession.h"
++
++void RangedAutoStart(Player*, Unit*);
+ 
+ void WorldSession::HandleAttackSwingOpcode(WorldPacket& recvData)
+ {
+@@ -62,7 +64,7 @@
+         }
+     }
+ 
+-    _player->Attack(pEnemy, true);
++    RangedAutoStart(_player, pEnemy);
+ }
+ 
+ void WorldSession::HandleAttackStopOpcode(WorldPacket& /*recvData*/)
+--- a/src/server/game/Handlers/SpellHandler.cpp
++++ b/src/server/game/Handlers/SpellHandler.cpp
+@@ -375,6 +375,9 @@
+     _player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_USE_GAMEOBJECT, go->GetEntry());
+ }
+ 
++void RangedAutoStart(Player*, Unit*);
++void RangedAutoClientCancel(Player*);
++
+ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
+ {
+     uint32 spellId;
+@@ -442,6 +445,12 @@
+     SpellCastTargets targets;
+     targets.Read(recvPacket, mover);
+     HandleClientCastFlags(recvPacket, castFlags, targets);
++
++    if (spellId == 970100 && mover == _player && _player->HasActiveSpell(spellId))
++    {
++        RangedAutoStart(_player, targets.GetUnitTarget());
++        return;
++    }
+ 
+     // not have spell in spellbook
+     if (mover->IsPlayer())
+@@ -645,6 +654,7 @@
+ 
+ void WorldSession::HandleCancelAutoRepeatSpellOpcode(WorldPacket& /*recvPacket*/)
+ {
++    RangedAutoClientCancel(_player);
+     // may be better send SMSG_CANCEL_AUTO_REPEAT?
+     // cancel and prepare for deleting
+     _player->InterruptSpell(CURRENT_AUTOREPEAT_SPELL);
+--- a/src/server/game/Entities/Unit/Unit.cpp
++++ b/src/server/game/Entities/Unit/Unit.cpp
+@@ -3702,8 +3702,12 @@
+     }
+ }
+ 
++void RangedAutoUpdate(Player*, uint32);
++void RangedAutoStop(Player*);
++
+ void Unit::_UpdateSpells(uint32 time)
+ {
++    if (Player* player = ToPlayer()) RangedAutoUpdate(player, time);
+     if (m_currentSpells[CURRENT_AUTOREPEAT_SPELL])
+         _UpdateAutoRepeatSpell();
+ 
+@@ -7195,6 +7199,7 @@
+  */
+ bool Unit::AttackStop()
+ {
++    if (Player* player = ToPlayer()) RangedAutoStop(player);
+     if (!m_attacking)
+         return false;
+ 
+--- a/src/server/game/Spells/Spell.cpp
++++ b/src/server/game/Spells/Spell.cpp
+@@ -652,8 +652,8 @@
+     {
+         // wand case
+         if (m_attackType == RANGED_ATTACK)
+-            if ((playerCaster->getClassMask() & CLASSMASK_WAND_USERS) != 0)
+-                if (Item* pItem = playerCaster->GetWeaponForAttack(RANGED_ATTACK))
++            if (Item* pItem = playerCaster->GetWeaponForAttack(RANGED_ATTACK))
++                if (pItem->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_WAND)
+                     m_spellSchoolMask = SpellSchoolMask(1 << pItem->GetTemplate()->Damage[0].DamageType);
+     }
+ 
