@@ -6,6 +6,7 @@
 
 void InitializeUnifiedAttack();
 void RangedAutoStop(Player*);
+void RegisterAdaptiveAttackHooks();
 
 class adaptive_autoattack_player : public PlayerScript
 {
@@ -29,4 +30,5 @@ void Addmod_adaptive_autoattackScripts()
 {
     InitializeUnifiedAttack();
     new adaptive_autoattack_player();
+    RegisterAdaptiveAttackHooks();
 }

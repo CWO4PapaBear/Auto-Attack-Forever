@@ -76,7 +76,7 @@ void SetMode(Player* player, Unit* target, Mode mode)
 
 void InitializeUnifiedAttack()
 {
-    LOG_INFO("server.loading", "Adaptive Auto Attack: module loaded (preview 0.1.2; native Auto Shot).");
+    LOG_INFO("server.loading", "Adaptive Auto Attack: module loaded (no-core prototype 1; stock wand timing).");
 }
 void RangedAutoStop(Player* player)
 {
@@ -129,20 +129,24 @@ void RangedAutoUpdate(Player* player, uint32 diff)
     if (!sConfigMgr->GetOption<bool>("AdaptiveAutoAttack.Enable", true))
     { RangedAutoStop(player); return; }
     AttackState state;
+    bool due = false;
     {
         std::lock_guard<std::mutex> lock(stateLock);
         auto it = states.find(player->GetGUID().GetCounter());
         if (it == states.end()) return;
         it->second.settling = diff >= it->second.settling ? 0 : it->second.settling - diff;
         it->second.elapsed += diff;
-        if (it->second.elapsed < 100) return;
-        it->second.elapsed = 0;
+        due = it->second.elapsed >= 100;
+        if (due) it->second.elapsed = 0;
         state = it->second;
     }
     Unit* target = ObjectAccessor::GetUnit(*player, state.target);
     if (!target || player->GetVictim() != target || !player->IsAlive() || !target->IsAlive()
         || player->IsMounted() || !player->IsValidAttackTarget(target))
     { RangedAutoStop(player); return; }
+    // Native AttackStop no longer calls into this module. Check the victim on
+    // every update before the core processes another autorepeat shot.
+    if (!due) return;
     uint32 id = WeaponSpell(player);
     Mode desired = player->IsWithinMeleeRange(target) || !id ? Mode::Melee : Mode::Ranged;
     if (desired != state.mode) { SetMode(player, target, desired); return; }
