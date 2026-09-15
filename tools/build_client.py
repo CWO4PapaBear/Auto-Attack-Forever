@@ -14,6 +14,11 @@ def pack(rows,strings,f):
 def name(row,strings,text):
     for i in range(136,152):row[i]=0
     row[136]=len(strings);strings.extend(text.encode()+b'\0')
+
+def description(row,strings,text):
+    # Do not inherit class-specific Auto Shot text (including Hunter haste).
+    for i in range(170,186):row[i]=0
+    row[170]=len(strings);strings.extend(text.encode()+b'\0')
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--client',type=Path,required=True)
@@ -34,6 +39,11 @@ def main():
     for src,id,label in ((75,970100,'Auto Ranged'),(2764,970101,'Auto Throw'),(5019,970102,'Wand Attack')):
         row=byid[src].copy();row[0]=id;row[6]|=0x20;row[208:212]=[0]*4
         name(row,strings,label)
+        description(row,strings,{
+            970100:'Automatically attacks with your equipped ranged weapon. Switches to melee when the target is in melee range and resumes ranged attacks when the target moves away. Normal weapon requirements apply.',
+            970101:'Automatically attacks with your equipped thrown weapon.',
+            970102:'Automatically attacks with your equipped wand.',
+        }[id])
         if id==970100:row[69]=262156|65536|524288
         else:row[4]|=0x80
         if id==970101:
