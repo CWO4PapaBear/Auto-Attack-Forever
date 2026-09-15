@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.2-preview
+
+- Dispatch native Auto Shot (75) for bows, guns and crossbows on every class. The universal control is sufficient; native Auto Shot need not be learned separately.
+- Preserve ordinary native Auto Shot when the controller is not managing it, including while the module is disabled.
+- Remove the artificial 500 ms first-repeat floor only for custom wand spell 970102. Preserve remaining cooldowns and normal shot intervals.
+- Keep native spell records, weapon restrictions, talents and passive grants unchanged. No new Hunter haste bonus is granted.
+- Recorded 67 Hunter shots and 38 Warrior shot attempts using spell 75. The Warrior had not learned Auto Shot. Wild Quiver was not learned on either test character and remains unverified.
+- User confirmed snappier wand startup. Latest changes were built on the modified playerbots core; a new full stock-core build remains pending.
+
 ## 0.1.1-preview
 
 - Replaced inherited Auto Shot tooltip text with a description of automatic ranged/melee switching. Auto Ranged no longer claims a Hunter attack-speed bonus.

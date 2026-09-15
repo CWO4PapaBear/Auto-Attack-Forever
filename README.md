@@ -12,7 +12,11 @@ For hunter-style characters in Free Pick or Wildcard systems, universal ranged a
 
 This module supplies the basic attack controls; it does not itself refund ability selections or change a Free Pick/Wildcard system's ability pool. That system must treat the supplied attack as free to realize this benefit. Ordinary hunters keep their existing abilities, and all classes retain their normal weapon restrictions.
 
-**0.1.1 preview — corrected client tooltips; server controller built and gameplay-tested on stock AzerothCore at the supported revision. Extended compatibility testing remains open.**
+**0.1.2 preview — native Auto Shot dispatch and faster wand startup. The previous release passed stock-core testing; these updates were built and tested on a modified AzerothCore server. Wild Quiver and extended compatibility testing remain open.**
+
+Auto Ranged dispatches native Auto Shot (spell 75) for bows, guns and crossbows, regardless of class, without teaching or requiring a separate Auto Shot ability. This preserves the native shot identity used by Hunter talent and proc rules. It does not grant Hunter talents or the Hunter's separate 15% haste passive. Wild Quiver recognition is supported by the spell identity, but its actual proc behavior has not yet been verified in game. Thrown weapons and wands retain their custom handlers. Custom wand attacks skip the core's artificial 500 ms startup floor without resetting remaining attack cooldowns or changing normal firing intervals.
+
+Upgrading from 0.1.0/0.1.1? Read [the upgrade instructions](docs/UPGRADE-0.1.2.md) before changing the patched core.
 
 Right-click an enemy to use the equipped ranged weapon outside melee reach and melee attacks at close range. If the target moves back into valid ranged distance, ranged attacks resume. The General spellbook contains **Auto Melee** and **Auto Ranged**; the optional addon changes Auto Ranged's icon to the equipped ranged weapon on Blizzard action bars.
 
