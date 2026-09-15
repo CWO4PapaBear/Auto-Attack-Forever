@@ -51,7 +51,7 @@ for name in ('Player.h','Item.h','ObjectAccessor.h','Spell.h','SpellInfo.h','Spe
     (out/name).write_text('#include "stub.h"\n')
 source=(Path(__file__).resolve().parents[1]/'src/AdaptiveAutoAttack.cpp').resolve().as_posix()
 test=r'''
-void Player::AttackStop(){RangedAutoStop(this);victim=nullptr;melee=false;}
+void Player::AttackStop(){victim=nullptr;melee=false;}
 int main(){
  { Player p; Unit enemy; Spell native(&p,sSpellMgr->GetSpellInfo(75),TRIGGERED_NONE);
    SpellCastTargets t;t.SetUnitTarget(&enemy);native.prepare(&t);
