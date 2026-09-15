@@ -1,0 +1,11 @@
+--- a/src/server/game/Entities/Unit/Unit.cpp
++++ b/src/server/game/Entities/Unit/Unit.cpp
+@@ -3793,7 +3793,7 @@
+     }
+ 
+     // Apply delay (Hunter's autoshoot not affected)
+-    if (m_AutoRepeatFirstCast && getAttackTimer(RANGED_ATTACK) < 500 && spellProto->Id != HUNTER_AUTOSHOOT)
++    if (m_AutoRepeatFirstCast && getAttackTimer(RANGED_ATTACK) < 500 && spellProto->Id != HUNTER_AUTOSHOOT && spellProto->Id != 970102)
+     {
+         setAttackTimer(RANGED_ATTACK, 500);
+     }
