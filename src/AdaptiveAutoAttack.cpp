@@ -30,7 +30,9 @@ uint32 WeaponSpell(Player* player)
     {
         case ITEM_SUBCLASS_WEAPON_BOW:
         case ITEM_SUBCLASS_WEAPON_GUN:
-        case ITEM_SUBCLASS_WEAPON_CROSSBOW: return player->HasSpell(970100) ? 970100 : 0;
+        // The universal control authorizes dispatch; native Auto Shot preserves
+        // spell-family procs and core shot handling without teaching spell 75.
+        case ITEM_SUBCLASS_WEAPON_CROSSBOW: return player->HasSpell(970100) ? 75 : 0;
         case ITEM_SUBCLASS_WEAPON_THROWN: return player->HasSpell(970101) ? 970101 : 0;
         case ITEM_SUBCLASS_WEAPON_WAND: return player->HasSpell(970102) ? 970102 : 0;
         default: return 0;
@@ -38,7 +40,8 @@ uint32 WeaponSpell(Player* player)
 }
 bool IsOurs(Spell* spell)
 {
-    return spell && spell->GetSpellInfo()->Id >= 970100 && spell->GetSpellInfo()->Id <= 970102;
+    return spell && (spell->GetSpellInfo()->Id == 75 ||
+        (spell->GetSpellInfo()->Id >= 970100 && spell->GetSpellInfo()->Id <= 970102));
 }
 void SetMode(Player* player, Unit* target, Mode mode)
 {
@@ -73,12 +76,15 @@ void SetMode(Player* player, Unit* target, Mode mode)
 
 void InitializeUnifiedAttack()
 {
-    LOG_INFO("server.loading", "Adaptive Auto Attack: module loaded (preview 0.1.0).");
+    LOG_INFO("server.loading", "Adaptive Auto Attack: module loaded (preview 0.1.2; native Auto Shot).");
 }
 void RangedAutoStop(Player* player)
 {
-    { std::lock_guard<std::mutex> lock(stateLock); states.erase(player->GetGUID().GetCounter()); }
-    if (IsOurs(player->GetCurrentSpell(CURRENT_AUTOREPEAT_SPELL)))
+    bool managed;
+    { std::lock_guard<std::mutex> lock(stateLock); managed = states.erase(player->GetGUID().GetCounter()) != 0; }
+    Spell* current = player->GetCurrentSpell(CURRENT_AUTOREPEAT_SPELL);
+    // Native Auto Shot outside our controller must still work, including when disabled.
+    if (IsOurs(current) && (managed || current->GetSpellInfo()->Id != 75))
         player->InterruptSpell(CURRENT_AUTOREPEAT_SPELL);
 }
 // Called only for a ranged-cancel packet. A melee-stop command always follows
