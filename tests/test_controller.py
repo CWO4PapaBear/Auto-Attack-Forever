@@ -22,7 +22,7 @@ struct Spell;
 struct Player:Unit {
     Unit* victim=nullptr;Spell* current=nullptr;Item item;bool melee=false,moving=false;int sheath=0,stopPackets=0,shots=0;
     Player(){guid.id=1;}
-    Item* GetWeaponForAttack(int,bool){return &item;} bool HasSpell(uint32){return true;}
+    Item* GetWeaponForAttack(int,bool){return &item;} bool HasSpell(uint32 id){return id!=75;}
     Spell* GetCurrentSpell(int){return current;}void InterruptSpell(int){current=nullptr;}
     bool IsMounted(){return false;} bool IsValidAttackTarget(Unit*t){return t&&t->alive;}
     bool IsWithinMeleeRange(Unit*t){return t->near;} void ClearUnitState(int){melee=false;}
@@ -38,7 +38,7 @@ struct Spell { Player*p;SpellInfo const*info;SpellCastTargets m_targets;
     void InitExplicitTargets(SpellCastTargets const&t){m_targets=t;}int CheckCast(bool){return SPELL_CAST_OK;}
     void prepare(SpellCastTargets const*t){m_targets=*t;p->current=this;++p->shots;}
 };
-struct Manager {SpellInfo info[3]={{970100},{970101},{970102}};SpellInfo const*GetSpellInfo(uint32 id){return &info[id-970100];}};
+struct Manager {SpellInfo native{75};SpellInfo info[3]={{970100},{970101},{970102}};SpellInfo const*GetSpellInfo(uint32 id){return id==75?&native:&info[id-970100];}};
 inline Manager manager;inline Manager*sSpellMgr=&manager;
 namespace ObjectAccessor { inline Unit*GetUnit(Player&p,ObjectGuid id){return p.victim&&p.victim->guid==id?p.victim:nullptr;} }
 #define LOG_INFO(...) ((void)0)
@@ -53,11 +53,15 @@ source=(Path(__file__).resolve().parents[1]/'src/AdaptiveAutoAttack.cpp').resolv
 test=r'''
 void Player::AttackStop(){RangedAutoStop(this);victim=nullptr;melee=false;}
 int main(){
- for(uint32 kind:{2u,3u,16u,19u}){
+ { Player p; Unit enemy; Spell native(&p,sSpellMgr->GetSpellInfo(75),TRIGGERED_NONE);
+   SpellCastTargets t;t.SetUnitTarget(&enemy);native.prepare(&t);
+   RangedAutoStop(&p);assert(p.current==&native);p.InterruptSpell(CURRENT_AUTOREPEAT_SPELL); }
+ for(uint32 kind:{2u,3u,18u,16u,19u}){
   Player p;Unit enemy;p.item.value.SubClass=kind;
   RangedAutoStart(&p,&enemy);assert(!p.melee&&p.victim==&enemy&&p.stopPackets==1);
   RangedAutoUpdate(&p,1);assert(!p.current);
   RangedAutoClientCancel(&p);RangedAutoUpdate(&p,100);assert(p.current&&!p.melee);
+  assert(p.current->GetSpellInfo()->Id==(kind==16?970101u:kind==19?970102u:75u));
   auto first=p.current;RangedAutoUpdate(&p,300);assert(p.current==first);
   enemy.near=true;RangedAutoUpdate(&p,100);assert(p.melee&&!p.current);
   RangedAutoClientCancel(&p);assert(p.victim==&enemy&&p.melee);
