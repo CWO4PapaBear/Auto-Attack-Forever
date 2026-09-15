@@ -12,7 +12,7 @@ For hunter-style characters in Free Pick or Wildcard systems, universal ranged a
 
 This module supplies the basic attack controls; it does not itself refund ability selections or change a Free Pick/Wildcard system's ability pool. That system must treat the supplied attack as free to realize this benefit. Ordinary hunters keep their existing abilities, and all classes retain their normal weapon restrictions.
 
-**0.1.0 preview — built and gameplay-tested on stock AzerothCore at the supported revision. Extended compatibility testing remains open.**
+**0.1.1 preview — corrected client tooltips; server controller built and gameplay-tested on stock AzerothCore at the supported revision. Extended compatibility testing remains open.**
 
 Right-click an enemy to use the equipped ranged weapon outside melee reach and melee attacks at close range. If the target moves back into valid ranged distance, ranged attacks resume. The General spellbook contains **Auto Melee** and **Auto Ranged**; the optional addon changes Auto Ranged's icon to the equipped ranged weapon on Blizzard action bars.
 
