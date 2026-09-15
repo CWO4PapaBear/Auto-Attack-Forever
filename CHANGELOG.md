@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.2.0-preview
+
+- Replace all core integration edits with existing ServerScript and UnitScript hooks.
+- Preserve native Auto Shot dispatch, all five weapon types and automatic melee/ranged switching.
+- Retain stock wand startup timing and normal equipment restrictions.
+- Build and gameplay validated on unmodified stock AzerothCore.
+- Replace patch installer with a read-only preflight; document migration from older patched versions.
+- Existing spell IDs, SQL and client patches remain compatible.
+- Record successful Wild Quiver testing on the preceding native-shot implementation.
+
+
 ## 0.1.2-preview
 
 - Dispatch native Auto Shot (75) for bows, guns and crossbows on every class. The universal control is sufficient; native Auto Shot need not be learned separately.
