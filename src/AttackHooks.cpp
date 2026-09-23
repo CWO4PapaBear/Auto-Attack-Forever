@@ -57,9 +57,12 @@ public:
         uint8 castCount, castFlags;
         uint32 spellId;
         packet >> castCount >> spellId >> castFlags;
-        if (spellId != 970100) return true;
+        // Hunter spell buttons may request native Auto Shot. The universal
+        // control authorizes it without teaching stock spell 75 to every class.
+        if (spellId != 970100 && spellId != 75) return true;
+        if (spellId == 75 && !player->HasActiveSpell(970100)) return true;
         SpellInfo const* info = sSpellMgr->GetSpellInfo(spellId);
-        if (!info || !player->HasActiveSpell(spellId) || info->IsPassive()) return false;
+        if (!info || !player->HasActiveSpell(970100) || info->IsPassive()) return false;
         // This is an attack-control command. Do not queue it through the core's
         // direct handler replay (which bypasses packet hooks). The controller
         // waits for an existing non-melee cast before starting ranged fire.
@@ -68,6 +71,9 @@ public:
         SpellCastTargets targets;
         targets.Read(packet, player);
         session->HandleClientCastFlags(packet, castFlags, targets);
+        // Movement flags can change world/vehicle/possession state.
+        if (!player->IsInWorld() || player->IsBeingTeleported() ||
+            player->m_mover != player || player->GetVehicle() || player->isPossessing()) return false;
         RangedAutoStart(player, targets.GetUnitTarget());
         return false;
     }

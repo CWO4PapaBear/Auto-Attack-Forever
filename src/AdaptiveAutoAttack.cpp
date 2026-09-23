@@ -76,7 +76,7 @@ void SetMode(Player* player, Unit* target, Mode mode)
 
 void InitializeUnifiedAttack()
 {
-    LOG_INFO("server.loading", "Adaptive Auto Attack: module loaded (no-core prototype 1; stock wand timing).");
+    LOG_INFO("server.loading", "Adaptive Auto Attack: module loaded (0.2.1 spell opener; native Auto Shot requests and repeat preservation).");
 }
 void RangedAutoStop(Player* player)
 {
@@ -112,6 +112,16 @@ void RangedAutoClientCancel(Player* player)
 }
 void RangedAutoStart(Player* player, Unit* target)
 {
+    // Client spell buttons resend auto-shot commands during the rotation.
+    // Preserve the current repeat and settling window for the same victim.
+    if (sConfigMgr->GetOption<bool>("AdaptiveAutoAttack.Enable", true) && target &&
+        player->IsAlive() && !player->IsMounted() && player->IsValidAttackTarget(target))
+    {
+        std::lock_guard<std::mutex> lock(stateLock);
+        auto it = states.find(player->GetGUID().GetCounter());
+        if (it != states.end() && it->second.target == target->GetGUID() && player->GetVictim() == target)
+            return;
+    }
     RangedAutoStop(player);
     if (!sConfigMgr->GetOption<bool>("AdaptiveAutoAttack.Enable", true))
     { if (target) player->Attack(target, true); return; }

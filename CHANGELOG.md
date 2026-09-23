@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased — spell opener fix
+
+- Route authorized native Auto Shot requests into the adaptive controller.
+- Preserve running repeats and transition timers on duplicate start requests.
+- Recheck world/vehicle/possession state after movement flags.
+- Compiled controller and packet regression tests pass; PTR compile and gameplay verification pending.
+- No client or database update required.
+
 ## 0.2.0-preview
 
 - Replace all core integration edits with existing ServerScript and UnitScript hooks.
