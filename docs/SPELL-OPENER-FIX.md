@@ -4,7 +4,7 @@ The controller previously recognized only custom control 970100. Client-generate
 
 The patch routes 75 through the controller only when the player has active control 970100. Native behavior remains when the module is disabled or the control is absent. Requests for the same live victim preserve the running attack and pending transition. Explicit stop/cancel paths are unchanged. Ordinary spell casts still pass to the core. Movement processing is followed by world/vehicle/possession checks.
 
-Compiled stub tests pass for both modified C++ files. Both regressions fail against the pre-patch code. Tests cover spell-opening cast waits, repeated requests, all five weapon categories, melee transitions, explicit stops, authorization, module disablement, queued cancel and world changes. Full PTR compile and in-game reproduction remain pending. The exact reported opening spell/weapon has not yet been supplied; this fixes two confirmed paths without claiming a live reproduction.
+Compiled stub tests pass for both modified C++ files. Both regressions fail against the pre-patch code. Tests cover spell-opening cast waits, repeated requests, all five weapon categories, melee transitions, explicit stops, authorization, module disablement, queued cancel and world changes. Full PTR compile passed; source restoration succeeded and the built image matches the reviewed two-file patch. In-game reproduction remains pending. The exact reported opening spell/weapon has not yet been supplied; this fixes two confirmed paths without claiming a live reproduction.
 
 ## Build
 
@@ -25,3 +25,7 @@ Build only. The script uses the current PTR compose/image configuration, verifie
 - Check bows, guns, crossbows, thrown weapons and wands; retain ammo, range and movement restrictions.
 
 No SQL, DBC, MPQ, client addon or launcher changes. Bear Cave Main is not activated by this package. This work belongs solely to Auto-Attack-Forever.
+
+## Activation after build review
+
+Log testers out, then run `sudo python3 Activate-Test.py --activate --maintenance` in WSL. Live image/source/ports are checked before restart; a private startup verifies the new Auto-Attack marker and existing Hero/Minions modules before reopening TCP 8085. Failure restores the previous image and source. `--check` performs preflight only; `--rollback --maintenance` restores the previous version. No client files or SQL are changed.
