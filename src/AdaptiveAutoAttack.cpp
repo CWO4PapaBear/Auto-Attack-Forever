@@ -7,8 +7,11 @@
 #include "SpellMgr.h"
 #include "Log.h"
 #include "Config.h"
+#include "Chat.h"
 #include <mutex>
 #include <unordered_map>
+
+bool RangedAutoEnabled(Player*);
 
 namespace
 {
@@ -24,6 +27,7 @@ std::mutex stateLock;
 std::unordered_map<uint32, AttackState> states;
 uint32 WeaponSpell(Player* player)
 {
+    if (!RangedAutoEnabled(player)) return 0;
     Item* weapon = player->GetWeaponForAttack(RANGED_ATTACK, true);
     if (!weapon) return 0;
     switch (weapon->GetTemplate()->SubClass)
@@ -76,7 +80,7 @@ void SetMode(Player* player, Unit* target, Mode mode)
 
 void InitializeUnifiedAttack()
 {
-    LOG_INFO("server.loading", "Adaptive Auto Attack: module loaded (0.2.1 spell opener; native Auto Shot requests and repeat preservation).");
+    LOG_INFO("server.loading", "Adaptive Auto Attack: module loaded (0.2.2 ranged preference; melee fallback and generic weapon notice).");
 }
 void RangedAutoStop(Player* player)
 {
@@ -133,6 +137,20 @@ void RangedAutoStart(Player* player, Unit* target)
     }
     SetMode(player, target, mode);
     if (player->GetVictim() != target) RangedAutoStop(player);
+}
+void RangedAutoRequest(Player* player, Unit* target)
+{
+    // Only an explicit control-button request needs a missing-weapon notice.
+    // Use learned proficiencies, not the character's original class.
+    if (target && player->IsValidAttackTarget(target) && RangedAutoEnabled(player) && !WeaponSpell(player))
+    {
+        bool capable = false;
+        for (uint32 skill : {45u,46u,226u,176u,228u})
+            capable = capable || player->HasSkill(skill);
+        if (capable)
+            ChatHandler(player->GetSession()).SendSysMessage("Equip a ranged weapon to use Auto Ranged.");
+    }
+    RangedAutoStart(player, target);
 }
 void RangedAutoUpdate(Player* player, uint32 diff)
 {

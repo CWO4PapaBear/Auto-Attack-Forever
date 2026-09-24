@@ -36,6 +36,7 @@ source=(Path(__file__).resolve().parents[1]/'src/AttackHooks.cpp').as_posix()
 test=r'''
 int starts=0,stops=0;Unit* requested=nullptr;
 void RangedAutoStart(Player*,Unit* target){++starts;requested=target;}
+void RangedAutoRequest(Player*p,Unit* target){RangedAutoStart(p,target);}
 void RangedAutoStop(Player*){++stops;}
 void RangedAutoClientCancel(Player*){}
 void RangedAutoUpdate(Player*,uint32){}

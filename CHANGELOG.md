@@ -1,3 +1,8 @@
+## 0.2.2-preview - ranged preference
+
+- Add per-character ranged toggle, silent right-click melee fallback and generic Auto Ranged weapon notice.
+- Controller/hook compiled tests and Lua 5.1 options tests passed. Full PTR build and gameplay validation pending. No launcher release yet.
+
 # Changelog
 
 ## Unreleased — spell opener fix

@@ -11,6 +11,7 @@
 #include "Config.h"
 
 void RangedAutoStart(Player*, Unit*);
+void RangedAutoRequest(Player*, Unit*);
 void RangedAutoStop(Player*);
 void RangedAutoClientCancel(Player*);
 void RangedAutoUpdate(Player*, uint32);
@@ -74,7 +75,8 @@ public:
         // Movement flags can change world/vehicle/possession state.
         if (!player->IsInWorld() || player->IsBeingTeleported() ||
             player->m_mover != player || player->GetVehicle() || player->isPossessing()) return false;
-        RangedAutoStart(player, targets.GetUnitTarget());
+        if (spellId == 970100) RangedAutoRequest(player, targets.GetUnitTarget());
+        else RangedAutoStart(player, targets.GetUnitTarget());
         return false;
     }
 };

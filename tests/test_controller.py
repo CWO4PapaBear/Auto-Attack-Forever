@@ -22,7 +22,9 @@ struct Spell;
 struct Player:Unit {
     Unit* victim=nullptr;Spell* current=nullptr;Item item;bool melee=false,moving=false,casting=false;int sheath=0,stopPackets=0,shots=0;
     Player(){guid.id=1;}
-    Item* GetWeaponForAttack(int,bool){return &item;} bool HasSpell(uint32 id){return id!=75;}
+    bool rangedEnabled=true,weapon=true,capable=true;int notices=0;
+    Player* GetSession(){return this;}bool HasSkill(uint32){return capable;}
+    Item* GetWeaponForAttack(int,bool){return weapon?&item:nullptr;} bool HasSpell(uint32 id){return id!=75;}
     Spell* GetCurrentSpell(int){return current;}void InterruptSpell(int){current=nullptr;}
     bool IsMounted(){return false;} bool IsValidAttackTarget(Unit*t){return t&&t->alive;}
     bool IsWithinMeleeRange(Unit*t){return t->near;} void ClearUnitState(int){melee=false;}
@@ -45,14 +47,26 @@ namespace ObjectAccessor { inline Unit*GetUnit(Player&p,ObjectGuid id){return p.
 #define LOG_DEBUG(...) ((void)0)
 struct Config { template<class T> T GetOption(char const*,T value){return value;} };
 inline Config config;inline Config*sConfigMgr=&config;
+inline bool RangedAutoEnabled(Player*p){return p->rangedEnabled;}
+struct ChatHandler {Player*p;ChatHandler(Player*v):p(v){}void SendSysMessage(char const*){++p->notices;}};
 '''
 (out/'stub.h').write_text(stub)
-for name in ('Player.h','Item.h','ObjectAccessor.h','Spell.h','SpellInfo.h','SpellMgr.h','Log.h','Config.h'):
+for name in ('Player.h','Item.h','ObjectAccessor.h','Spell.h','SpellInfo.h','SpellMgr.h','Log.h','Config.h','Chat.h'):
     (out/name).write_text('#include "stub.h"\n')
 source=(Path(__file__).resolve().parents[1]/'src/AdaptiveAutoAttack.cpp').resolve().as_posix()
 test=r'''
 void Player::AttackStop(){victim=nullptr;melee=false;}
 int main(){
+ { Player p;Unit enemy;p.weapon=false;p.capable=false;
+   RangedAutoStart(&p,&enemy);RangedAutoUpdate(&p,1000);assert(p.melee&&!p.current&&p.notices==0);
+   RangedAutoRequest(&p,&enemy);assert(p.melee&&p.notices==0);RangedAutoStop(&p); }
+ { Player p;Unit enemy;p.weapon=false;
+   RangedAutoStart(&p,&enemy);assert(p.notices==0);
+   RangedAutoRequest(&p,&enemy);assert(p.melee&&p.notices==1);RangedAutoStop(&p); }
+ { Player p;Unit enemy;p.rangedEnabled=false;
+   RangedAutoRequest(&p,&enemy);RangedAutoUpdate(&p,1000);assert(p.melee&&!p.current&&p.notices==0);
+   p.rangedEnabled=true;RangedAutoUpdate(&p,100);RangedAutoUpdate(&p,100);assert(p.current);
+   p.rangedEnabled=false;RangedAutoUpdate(&p,100);assert(p.melee&&!p.current);RangedAutoStop(&p); }
  { Player p; Unit enemy; Spell native(&p,sSpellMgr->GetSpellInfo(75),TRIGGERED_NONE);
    SpellCastTargets t;t.SetUnitTarget(&enemy);native.prepare(&t);
    RangedAutoStop(&p);assert(p.current==&native);p.InterruptSpell(CURRENT_AUTOREPEAT_SPELL); }

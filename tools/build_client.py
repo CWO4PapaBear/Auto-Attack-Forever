@@ -44,7 +44,9 @@ def main():
             970101:'Automatically attacks with your equipped thrown weapon.',
             970102:'Automatically attacks with your equipped wand.',
         }[id])
-        if id==970100:row[69]=262156|65536|524288
+        # This is a controller request, not a shot. Let the server choose melee
+        # when no usable ranged weapon exists; actual shot spells retain checks.
+        if id==970100:row[68:71]=[0xFFFFFFFF,0,0]
         else:row[4]|=0x80
         if id==970101:
             row[5]&=~0x200
