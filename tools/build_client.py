@@ -52,6 +52,8 @@ def main():
             # spells retain their shapeshift restrictions.
             row[4]&=~0x10002  # no shapeshift restriction or ranged-slot check
             row[6]&=~0x20    # control is not itself a repeating shot
+            row[7]&=~0x8000  # not a native ranged attack action
+            row[8]&=~0x1000000  # do not arm client automatic ranged combat
             row[71]=3        # dummy request; server dispatch performs attacks
         else:row[4]|=0x80
         if id==970101:

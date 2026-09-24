@@ -1,3 +1,9 @@
+## Pending client indicator retest
+
+- Clear inherited native ranged-combat flags on control spell 970100.
+- Show Auto Ranged as active only for actual shot, thrown or wand repeats; preserve stock melee indicator.
+- Lua indicator/options checks pass; local client installed, gameplay retest pending. Launcher release remains separate.
+
 ## 0.2.3-preview - neutral control and feral melee
 
 - Stop treating the client dispatch control as an actual ranged repeat: clear ranged-slot/autorepeat flags and use a dummy effect. Actual server shots retain native checks and Auto Shot identity.

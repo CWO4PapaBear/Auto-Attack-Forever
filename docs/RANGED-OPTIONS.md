@@ -21,3 +21,7 @@ Spell 970100 also needs its Attributes NOT_SHAPESHIFTED bit (0x10000) cleared: i
 ## Follow-up after owner retest
 
 The form-loss test improved, but the non-ranged character still received a proper-item error and bear melee animation was inconsistent. The next candidate clears the client control ranged-slot bit (Attributes 0x2), autorepeat bit (AttributesEx2 0x20), and changes its first effect to dummy (3). It remains an authorized target request intercepted by the server, not a damaging cast; actual shots still use native spell 75 or the existing throw/wand spells. Both client archive copies are staged. The server additionally skips forced SHEATH_STATE_MELEE in feral forms, preserving normal form animation state. Full server build and owner retests are pending.
+
+## Ranged action indicator correction
+
+The feral server build is activated. Owner testing confirms improved bear animation and the expected too-far-away error on melee-only fallback. Both client archives now also clear control spell 970100 AttributesEx3 NORMAL_RANGED_ATTACK (0x8000) and AttributesEx4 AUTO_RANGED_COMBAT (0x1000000). The addon reflects actual repeats of 75, 970101 or 970102 on the control button, leaving stock melee flashing unchanged. Lua 5.1 indicator and options tests pass. Installed locally with backups; gameplay retest pending. No additional server build or SQL migration. Launcher release not published.
