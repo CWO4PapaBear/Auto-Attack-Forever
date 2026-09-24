@@ -22,7 +22,8 @@ struct Spell;
 struct Player:Unit {
     Unit* victim=nullptr;Spell* current=nullptr;Item item;bool melee=false,moving=false,casting=false;int sheath=0,stopPackets=0,shots=0;
     Player(){guid.id=1;}
-    bool rangedEnabled=true,weapon=true,capable=true;int notices=0;
+    bool rangedEnabled=true,weapon=true,capable=true,feral=false;int notices=0;
+    bool IsInFeralForm(){return feral;}
     Player* GetSession(){return this;}bool HasSkill(uint32){return capable;}
     Item* GetWeaponForAttack(int,bool){return weapon?&item:nullptr;} bool HasSpell(uint32 id){return id!=75;}
     Spell* GetCurrentSpell(int){return current;}void InterruptSpell(int){current=nullptr;}
@@ -57,6 +58,9 @@ source=(Path(__file__).resolve().parents[1]/'src/AdaptiveAutoAttack.cpp').resolv
 test=r'''
 void Player::AttackStop(){victim=nullptr;melee=false;}
 int main(){
+ { Player p;Unit enemy;p.feral=true;p.rangedEnabled=false;p.sheath=77;
+   RangedAutoStart(&p,&enemy);assert(p.melee&&p.sheath==77);
+   enemy.near=true;RangedAutoUpdate(&p,1000);assert(p.melee&&!p.current&&p.sheath==77);RangedAutoStop(&p); }
  { Player p;Unit enemy;p.weapon=false;p.capable=false;
    RangedAutoStart(&p,&enemy);RangedAutoUpdate(&p,1000);assert(p.melee&&!p.current&&p.notices==0);
    RangedAutoRequest(&p,&enemy);assert(p.melee&&p.notices==0);RangedAutoStop(&p); }

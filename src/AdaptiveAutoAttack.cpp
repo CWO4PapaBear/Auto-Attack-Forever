@@ -72,7 +72,9 @@ void SetMode(Player* player, Unit* target, Mode mode)
     else
     {
         player->Attack(target, true);
-        player->SetSheath(SHEATH_STATE_MELEE);
+        // Feral forms use their own attack animations, not drawn weapons.
+        if (!player->IsInFeralForm())
+            player->SetSheath(SHEATH_STATE_MELEE);
     }
     LOG_DEBUG("module.adaptive_autoattack", "Adaptive Auto Attack: mode={} player={}", mode == Mode::Melee ? "melee" : "ranged", player->GetGUID().GetCounter());
 }
@@ -80,7 +82,7 @@ void SetMode(Player* player, Unit* target, Mode mode)
 
 void InitializeUnifiedAttack()
 {
-    LOG_INFO("server.loading", "Adaptive Auto Attack: module loaded (0.2.2 ranged preference; melee fallback and generic weapon notice).");
+    LOG_INFO("server.loading", "Adaptive Auto Attack: module loaded (0.2.3 feral melee; ranged preference and melee fallback).");
 }
 void RangedAutoStop(Player* player)
 {

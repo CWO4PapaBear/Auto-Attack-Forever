@@ -1,3 +1,8 @@
+## 0.2.3-preview - neutral control and feral melee
+
+- Stop treating the client dispatch control as an actual ranged repeat: clear ranged-slot/autorepeat flags and use a dummy effect. Actual server shots retain native checks and Auto Shot identity.
+- Do not force humanoid melee weapon stance in feral forms. Compiled controller/hook tests passed; full build and gameplay retest pending. Both root and locale client archives staged; not installed yet.
+
 ## Control spell form and duplicate-archive correction
 
 - Remove the inherited not-shapeshifted flag from control spell 970100, preserving restrictions on native ranged shots.

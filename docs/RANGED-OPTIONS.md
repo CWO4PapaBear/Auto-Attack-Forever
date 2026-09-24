@@ -17,3 +17,7 @@ Publish source to `main`. Client assets and launcher promotion are separate. Ret
 ## Client correction after initial testing
 
 Spell 970100 also needs its Attributes NOT_SHAPESHIFTED bit (0x10000) cleared: it is a dispatch control that may select melee in form. Native Auto Shot and actual ranged attacks keep their restrictions. Inspect both root and locale patch copies rather than assuming one archive wins; the first installation left the root copy with an old weapon requirement. Both copies were corrected locally, verifying every other spell field and archive entry unchanged. Owner gameplay retest remains pending; do not claim the approach-triggered bear-form issue resolved until tested.
+
+## Follow-up after owner retest
+
+The form-loss test improved, but the non-ranged character still received a proper-item error and bear melee animation was inconsistent. The next candidate clears the client control ranged-slot bit (Attributes 0x2), autorepeat bit (AttributesEx2 0x20), and changes its first effect to dummy (3). It remains an authorized target request intercepted by the server, not a damaging cast; actual shots still use native spell 75 or the existing throw/wand spells. Both client archive copies are staged. The server additionally skips forced SHEATH_STATE_MELEE in feral forms, preserving normal form animation state. Full server build and owner retests are pending.

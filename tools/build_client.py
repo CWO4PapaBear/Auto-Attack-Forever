@@ -50,7 +50,9 @@ def main():
             row[68:71]=[0xFFFFFFFF,0,0]
             # The control can request melee while in form. Actual ranged shot
             # spells retain their shapeshift restrictions.
-            row[4]&=~0x10000
+            row[4]&=~0x10002  # no shapeshift restriction or ranged-slot check
+            row[6]&=~0x20    # control is not itself a repeating shot
+            row[71]=3        # dummy request; server dispatch performs attacks
         else:row[4]|=0x80
         if id==970101:
             row[5]&=~0x200
