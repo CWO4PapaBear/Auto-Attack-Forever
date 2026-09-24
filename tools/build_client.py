@@ -46,7 +46,11 @@ def main():
         }[id])
         # This is a controller request, not a shot. Let the server choose melee
         # when no usable ranged weapon exists; actual shot spells retain checks.
-        if id==970100:row[68:71]=[0xFFFFFFFF,0,0]
+        if id==970100:
+            row[68:71]=[0xFFFFFFFF,0,0]
+            # The control can request melee while in form. Actual ranged shot
+            # spells retain their shapeshift restrictions.
+            row[4]&=~0x10000
         else:row[4]|=0x80
         if id==970101:
             row[5]&=~0x200

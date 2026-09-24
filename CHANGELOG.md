@@ -1,3 +1,8 @@
+## Control spell form and duplicate-archive correction
+
+- Remove the inherited not-shapeshifted flag from control spell 970100, preserving restrictions on native ranged shots.
+- Repair both root and locale client patch copies; the root copy still contained the old equipment restriction. Verified that only control flags changed and unrelated archive entries were preserved. Installed locally with backups; gameplay retest pending.
+
 ## Minimap settings shortcut
 
 - Add the existing AAF logo as a custom 64x64 RGBA TGA minimap icon. Click opens the existing Interface options; drag position is saved per character.

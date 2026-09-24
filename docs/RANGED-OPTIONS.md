@@ -13,3 +13,7 @@ Commands: `.aaf ranged status`, `.aaf ranged on`, `.aaf ranged off`. Server Play
 Before release, test silent distant right-click and explicit requests on characters without ranged proficiency; generic notices for capable characters lacking weapons; disabling during a ranged repeat; remaining shapeshifted as a target leaves melee; re-enabling all five weapon types and spell openers; and per-character persistence after logout. Local mocks do not replace these checks.
 
 Publish source to `main`. Client assets and launcher promotion are separate. Retain the old server image and backed-up client files for rollback.
+
+## Client correction after initial testing
+
+Spell 970100 also needs its Attributes NOT_SHAPESHIFTED bit (0x10000) cleared: it is a dispatch control that may select melee in form. Native Auto Shot and actual ranged attacks keep their restrictions. Inspect both root and locale patch copies rather than assuming one archive wins; the first installation left the root copy with an old weapon requirement. Both copies were corrected locally, verifying every other spell field and archive entry unchanged. Owner gameplay retest remains pending; do not claim the approach-triggered bear-form issue resolved until tested.
