@@ -2,5 +2,7 @@
 ## Title: Auto-Attack Forever
 ## Notes: Automatic attack controls, per-character ranged preference and equipped weapon icons.
 ## Version: 0.2.2-preview
+## SavedVariablesPerCharacter: AAFMinimapDB
 AdaptiveAutoAttack.lua
 Options.lua
+Minimap.lua

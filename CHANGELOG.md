@@ -1,3 +1,9 @@
+## Minimap settings shortcut
+
+- Add the existing AAF logo as a custom 64x64 RGBA TGA minimap icon. Click opens the existing Interface options; drag position is saved per character.
+- Installed locally with backups; Lua 5.1 syntax passed. Visual verification pending.
+- Ranged-options server build and activation confirmed; gameplay tests in progress. Launcher publication pending.
+
 ## 0.2.2-preview - ranged preference
 
 - Add per-character ranged toggle, silent right-click melee fallback and generic Auto Ranged weapon notice.

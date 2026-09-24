@@ -1,6 +1,6 @@
 # Ranged preference and melee fallback (0.2.2)
 
-Status: compiled controller/packet-hook tests and Lua 5.1 panel tests passed. Full PTR build, client installation, activation and gameplay verification pending.
+Status: compiled controller/packet-hook tests and Lua 5.1 panel tests passed. Full PTR build, client installation and activation confirmed. Gameplay verification pending.
 
 Right-clicking a distant enemy without a usable ranged weapon starts melee silently. This does not move the character or permit melee damage at range. Explicit Auto Ranged requests without a weapon give `Equip a ranged weapon to use Auto Ranged.` only when the character has ranged proficiency; otherwise they silently start melee. Capability uses learned skills, not original class, so Hybrid characters are supported.
 
